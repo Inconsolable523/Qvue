@@ -232,7 +232,7 @@ function statusSetDown(oName,ssocket){
   });
 }
 const clients=[]
-io.on('connection', (socket) => {
+io.on('connection', function(socket){
   console.log(777777777)
   // 获取在线用户
   getUserUp(socket)
