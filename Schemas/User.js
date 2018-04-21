@@ -9,6 +9,10 @@ var UserSchema = new mongoose.Schema({
     nickname: String,
     username: String,
     password: String,
+    status:{
+      type: String,
+      default: "down"
+    },
     sex: String,
     picUrl: String
 })

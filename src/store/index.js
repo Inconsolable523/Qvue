@@ -17,11 +17,11 @@ export default new Vuex.Store({
 		robot: {
 			Info: {
 				userId: 'robot',
-				nickname: '小美',
+				nickname: '小超',
 				headPic: '/static/img/robot-headpic.jpg'
 			},
 			// 机器人打招呼
-			greetMsg: 'hi~ 我是机器人小美，有什么可以帮您的嘛？'
+			greetMsg: 'hi~ 我是机器人小超，有什么可以帮您的嘛？'
 		}
 	},
 	getters: {

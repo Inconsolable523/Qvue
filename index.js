@@ -182,7 +182,7 @@ function getRobotMsg(msg, callback) {
         userId: 'robot',
         roomId: msg.roomId,
         timeStamp: msg.timeStamp || Date.parse(new Date()),
-        nickname: '小美',
+        nickname: '小超',
         headPic: '/static/img/robot-headpic.jpg',
         text: resText.results[0].values.text
       }
@@ -226,7 +226,7 @@ io.on('connection', (socket) => {
         timeStamp: msg.timeStamp + 1 || null,
         text: msgArr[1]
       }
-      if (msgArr[0] === '@小美') {
+      if (msgArr[0] === '@小超') {
         getRobotMsg(robotParam, (robotmsg) => {
           saveChatMsg(robotmsg)
           io.to(msg.roomId).emit('chat-msg', robotmsg)

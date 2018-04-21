@@ -2,7 +2,7 @@
 	<div class="contain">
 		<div class="top" :style="'background:'+getThemeColor">
 			<div class="left-icon" @click="goBack()"></div>
-			<span class="title">聊天室(在线6人)</span>
+			<span class="title">聊天室</span>
 			<div class="right-icon"></div>
 		</div>
 		<div class="msg-content">
@@ -15,9 +15,11 @@
 			</div>
 		</div>
 		<div class="bottom-input">
-			<textarea col="2" v-model="InputMsg"></textarea>
+			<input  v-model="InputMsg">
 			<div v-show="!InputMsg" class="btn-default">发送</div>
-			<div v-show="InputMsg" class="btn-active" @click="submit">发送</div>
+			<div v-show="InputMsg" class="btn-active"  v-on:keyup.enter="submit" @click="submit">发送</div>
+			
+		
 		</div>
 		<div class="extra-fun">
 			<div class="load-pic">
@@ -64,6 +66,9 @@ export default{
 					this.msgDOM.scrollTop = this.msgDOM.scrollHeight
 			})
 		})
+
+		// 测试
+		
 		// 聊天
 		this.socket.on('chat-msg', (msg) => {
 			console.log(msg)
@@ -118,6 +123,9 @@ export default{
 				text: this.InputMsg
 			}
 			this.socket.emit('chat-msg', MsgObj)
+			this.socket.on('user_list',(msg) =>{
+			console.log(msg,11111)
+		})
 			this.InputMsg = ''
 		},
 		// 上传图片
@@ -204,7 +212,7 @@ $white: #FFF;
 		bottom: 30px;
 		display: flex;
 		align-items: center;
-		textarea {
+		input {
 			width: 80%;
 			height: 25px;
 			line-height: 25px;

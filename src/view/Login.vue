@@ -3,7 +3,7 @@
     <div class="bg"></div>
     <!--<div class="bg-shade"></div>-->
     <div class="content">
-      <div class="title">VueChat</div>
+      <div class="title">QTwo</div>
       <input class="username" type="text" v-model="username" placeholder="请输入用户名"/>
       <input class="password" type="password" v-model="password" placeholder="请输入密码"/>
       <div class="login" @click="login()">登录</div>
@@ -93,7 +93,7 @@ $style: #000;
   height: 100%;
   .title {
     position: absolute;
-    top: 100px;
+    top: 38px;
     font-size: 35px;
     font-weight: bold;
     color: $style;

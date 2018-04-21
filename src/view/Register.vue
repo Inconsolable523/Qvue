@@ -18,6 +18,8 @@
 
 <script>
 import Alert from '@/components/Alert'
+import {setItem} from '@/plugin/sessionStorage-plugin'
+
 export default {
   data() {
     return {

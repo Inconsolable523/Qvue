@@ -39,6 +39,7 @@
 <script type="text/javascript">
 import {mapGetters} from 'vuex'
 import DropList from '@/components/DropList'
+
 export default{
   data() {
     return {
