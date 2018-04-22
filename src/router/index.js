@@ -4,6 +4,7 @@ import Login from '@/view/Login'
 import Register from '@/view/Register'
 import Chat from '@/view/Chat'
 import Home from '@/view/Home'
+import personDetail from '@/view/person'
 import Group from '@/view/Group'
 import Robot from '@/view/Robot'
 import MsgBoardIndex from '@/view/MsgBoardIndex'
@@ -45,6 +46,11 @@ export default new Router({
       path: '/Chat',
       name: 'Chat',
       component: Chat
+    },
+    {
+      path: '/personDetail',
+      name: 'personDetail',
+      component: personDetail
     },
     {
       path: '/MsgBoardIndex',

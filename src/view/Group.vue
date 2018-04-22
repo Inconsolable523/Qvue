@@ -8,7 +8,7 @@
       <div class="red" @click="changeTheme('#c00')"></div>
     </div>
     <div class="top" :style="'background:'+getThemeColor">
-      <div class="head-pic">
+      <div class="head-pic" @click="personDetail">
         <img :src="getUserinfo.headPic" alt="headpic" width="100%" height="100%"/>
       </div>
       <div class="title">聊天群</div>
@@ -72,6 +72,9 @@ export default{
   methods: {
     EnterRoom(room) {
       this.$router.push({name: 'Chat', query: {room: room}})
+    },
+    personDetail(){
+      this.$router.push({name: 'personDetail'})
     },
     showDropList() {
       this.$refs.droplist.show()

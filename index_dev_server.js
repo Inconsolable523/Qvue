@@ -158,10 +158,9 @@ function getUserUp(ssocket) {
     if (err) {
       console.log(err);
     } else {
-      console.log('users list --default: ' + docs);
       // 因为是回调函数  socket.emit放在这里可以防止  用户更新列表滞后
-      ssocket.emit('user_list', docs);           //更新用户列表
-               //更新用户列表
+      ssocket.broadcast.emit('user_list', docs);           //更新用户列表
+      ssocket.emit('user_list',docs);         //更新用户列表
 
     }
   });
@@ -233,20 +232,8 @@ function statusSetDown(oName,ssocket){
 }
 const clients=[]
 io.on('connection', function(socket){
-  console.log(777777777)
   // 获取在线用户
   getUserUp(socket)
-  var client = {
-    Socket: socket,
-    name: '----'
-  };
-  socket.on("message", function (name) {
-    client.name = name;                    // 接收user name
-    clients.push(client);                     //保存此client
-    console.log("client-name:  " + client.name);
-    socket.broadcast.emit("userIn", "system@: 【" + client.name + "】-- a newer ! Let's welcome him ~");
-  });
-  socket.emit("system", "system@:  Welcome ! Now chat with others");
   // 私聊
   socket.on("say_private", function (fromuser, touser, content) {    //私聊阶段
     var toSocket = "";
@@ -313,18 +300,18 @@ io.on('connection', function(socket){
     socket.to(info.roomId).broadcast.emit('leave-room', leaveInfo)
   })
 
-  socket.on('disconnect',function(){       // Event:  disconnect
-    const Name = "";       
-    for(var n in clients){                       
-        if(clients[n].Socket === socket){     // get socket match
-            Name = clients[n].name;
-        }
-    }
-    statusSetDown(Name,socket);         // status  -->  set down
+//   socket.on('disconnect',function(){       // Event:  disconnect
+//     const Name = "";       
+//     for(var n in clients){                       
+//         if(clients[n].Socket === socket){     // get socket match
+//             Name = clients[n].name;
+//         }
+//     }
+//     statusSetDown(Name,socket);         // status  -->  set down
     
-    socket.broadcast.emit('userOut',"system@: 【"+client.name+"】 leave ~");
-    console.log(client.name + ':   disconnect');
+//     socket.broadcast.emit('userOut',"system@: 【"+client.name+"】 leave ~");
+//     console.log(client.name + ':   disconnect');
 
-});
+// });
 })
 module.exports = http

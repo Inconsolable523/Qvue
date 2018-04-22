@@ -51,8 +51,7 @@ export default{
 	},
 	mounted() {
 		this.msgDOM = document.querySelector('.msg-content')
-		// this.socket = io('http://localhost:3000')
-		this.socket = io('http://www.chenleiming.com:3000')
+		this.socket = io('http://localhost:3000')
 		// 进入房间
 		const infoObj = {
 			status: 'userstate',
@@ -66,12 +65,9 @@ export default{
 					this.msgDOM.scrollTop = this.msgDOM.scrollHeight
 			})
 		})
-
-		// 测试
 		
 		// 聊天
 		this.socket.on('chat-msg', (msg) => {
-			console.log(msg)
 			this.MsgList.push(msg)
 			this.$nextTick(() => {
 				this.msgDOM.scrollTop = this.msgDOM.scrollHeight
@@ -123,9 +119,6 @@ export default{
 				text: this.InputMsg
 			}
 			this.socket.emit('chat-msg', MsgObj)
-			this.socket.on('user_list',(msg) =>{
-			console.log(msg,11111)
-		})
 			this.InputMsg = ''
 		},
 		// 上传图片
