@@ -8,7 +8,7 @@
     <div class="msg-text" v-if="msg.img">
       <img :src="msg.img" alt="" width="100%" height="100%">
     </div>
-    <div class="msg-text" v-if="msg.text" v-text="msg.text"></div>
+    <div class="msg-text" v-if="msg.text" v-html="msg.text"></div>
   </div>
 </template>
 

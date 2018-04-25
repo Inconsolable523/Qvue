@@ -2,15 +2,15 @@
 	<div class="contain">
     <div class="content">
       <div class="head-pic">
-        <div>{{getUserinfo.nickname}}</div>
+        <div>昵称：{{getUserinfo.nickname}}</div>
         <img :src="getUserinfo.headPic" alt="headpic"/>        
       </div>
       <div class="showUp">
         <h3>在线用户：</h3>
         <ul class="showUpDetail">
-          <li v-for="(msg,index) in MsgLists" :key="index">
+          <li v-for="(msg,index) in MsgLists" :key="index"  @click="test(msg)">
             <img :src="msg.picUrl" alt="headpic">
-            <span>{{ msg.nickname }}</span>
+            <span>昵称：{{ msg.nickname }}</span>
           </li>
         </ul>
       </div>
@@ -69,6 +69,9 @@ this.msgDOM = document.querySelector('.showUp')
     ...mapGetters(["getUserinfo"])
   },
   methods: {
+    test(e){
+      this.$router.push({name: 'private',query:{use:e}})
+    },
     InitInfo() {
       this.$store.commit("setUserinfo", getItem("userInfo"));
     },

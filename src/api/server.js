@@ -1,5 +1,4 @@
 import Axios from './axios.js'
-// const BaseUrl = 'http://www.chenleiming.com:3000'
 const BaseUrl = ''
 const Server = {
 	// 注册用户

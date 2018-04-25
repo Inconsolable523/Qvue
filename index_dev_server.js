@@ -4,6 +4,7 @@ var io = require('socket.io')(http)
 var multer = require('./util/multer.js')
 var cors = require('cors')
 var request = require('superagent')
+var users={}
 
 //bodyParse Config
 var bodyParser = require('body-parser')
@@ -61,6 +62,7 @@ app.post('/register', function (req, res) {
 // 登录用户
 app.post('/login', function (req, res) {
   const data = req.body
+  users[data.username] =  data.username
   User.findOne({ username: data.username, password: data.password }, (err, user) => {
     if (err) {
       console.log('login err')
@@ -200,7 +202,7 @@ function getRobotMsg(msg, callback) {
         timeStamp: msg.timeStamp || Date.parse(new Date()),
         nickname: '小超',
         headPic: '/static/img/robot-headpic.jpg',
-        text: resText.results[ 0 ].values.text
+        text: resText.results[0].values.text
       }
       callback(msgObj)
     })
@@ -259,19 +261,30 @@ io.on('connection', function(socket){
     }
     socket.to(info.roomId).broadcast.emit('join-room', joinInfo)
   })
+  // 私聊
+  socket.on('chat-secret', function(data) {
+    for(var i in users){
+        if(users[i].name==data.nickname){
+            // users[i].emit('chat secret',data);
+            socket.to(data.nickname).broadcast.emit('chat-secret', data)
+            console.log(users[i],1111)
+        }
+    }
+});
   // 群聊天
   socket.on('chat-msg', (msg) => {
     saveChatMsg(msg, () => {
       io.to(msg.roomId).emit('chat-msg', msg)
       // 分割聊天消息，判断是否与机器人聊天
       const msgArr = msg.text.split(' ')
+      const num = msgArr.lastIndexOf('')
       const robotParam = {
         userId: msg.userId,
         roomId: msg.roomId || null,
         timeStamp: msg.timeStamp + 1 || null,
-        text: msgArr[ 1 ]
+        text: msgArr[num+1]
       }
-      if (msgArr[ 0 ] === '@小超') {
+      if (msgArr[0] === '@小超') {
         getRobotMsg(robotParam, (robotmsg) => {
           saveChatMsg(robotmsg)
           io.to(msg.roomId).emit('chat-msg', robotmsg)
@@ -300,18 +313,19 @@ io.on('connection', function(socket){
     socket.to(info.roomId).broadcast.emit('leave-room', leaveInfo)
   })
 
-//   socket.on('disconnect',function(){       // Event:  disconnect
-//     const Name = "";       
-//     for(var n in clients){                       
-//         if(clients[n].Socket === socket){     // get socket match
-//             Name = clients[n].name;
-//         }
-//     }
-//     statusSetDown(Name,socket);         // status  -->  set down
+  socket.on('disconnect',function(e){ 
+    console.log(e,3333)      // Event:  disconnect
+    const Name = "";       
+    for(var n in users){                       
+        if(users[n].Socket === socket){     // get socket match
+            Name = users[n].name;
+        }
+    }
+    statusSetDown(Name,socket);         // status  -->  set down
     
-//     socket.broadcast.emit('userOut',"system@: 【"+client.name+"】 leave ~");
-//     console.log(client.name + ':   disconnect');
+    // socket.broadcast.emit('userOut',"system@: 【"+client.name+"】 leave ~");
+    // console.log(client.name + ':   disconnect');
 
-// });
+});
 })
 module.exports = http

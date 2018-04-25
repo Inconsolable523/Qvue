@@ -32,8 +32,7 @@ import OtherMsg from '@/components/Msg/OtherMsg'
     },
     mounted() {
       this.msgDOM = document.querySelector('.msg-content')
-      // this.socket = io('http://localhost:3000')
-      this.socket = io('http://www.chenleiming.com:3000')
+      this.socket = io('http://localhost:3000')
       this.socket.on('robot-msg', (robotMsg) => {
         this.MsgList.push(robotMsg)
         this.$nextTick(() => {

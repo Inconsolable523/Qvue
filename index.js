@@ -16,7 +16,7 @@ app.use(bodyParser.json())
 // 引包
 var mongoose = require('mongoose')
 // 创建一个数据库连接
-mongoose.connect('mongodb://127.0.0.1:27017/vuechat')
+mongoose.connect('mongodb://127.0.0.1:27017/Qvue')
 
 var db = mongoose.connection;
 db.once('open', function (callback) {

@@ -39,6 +39,7 @@
 <script type="text/javascript">
 import {mapGetters} from 'vuex'
 import DropList from '@/components/DropList'
+import io from "socket.io-client";
 
 export default{
   data() {
@@ -89,6 +90,9 @@ export default{
       this.themeSet = true
     },
     signOut() {
+      var socket = io("http://localhost:3000");
+
+      socket.disconnect()
       this.$router.replace({name: 'Login'})
     }
   }

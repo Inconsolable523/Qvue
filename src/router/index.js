@@ -10,6 +10,7 @@ import Robot from '@/view/Robot'
 import MsgBoardIndex from '@/view/MsgBoardIndex'
 import MsgBoard from '@/view/MsgBoard'
 import MsgCreate from '@/view/MsgCreate'
+import Private from '@/view/private'
 
 Router.prototype.goBack = function () {
   this.isBack = true
@@ -51,6 +52,11 @@ export default new Router({
       path: '/personDetail',
       name: 'personDetail',
       component: personDetail
+    },
+    {
+      path: '/private',
+      name: 'private',
+      component: Private
     },
     {
       path: '/MsgBoardIndex',
