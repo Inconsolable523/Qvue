@@ -91,8 +91,9 @@ export default{
     },
     signOut() {
       var socket = io("http://localhost:3000");
-
-      socket.disconnect()
+    
+    socket.emit("setDown", this.getUserinfo.nickname);
+      // socket.disconnect(this.getUserinfo.nickname)
       this.$router.replace({name: 'Login'})
     }
   }

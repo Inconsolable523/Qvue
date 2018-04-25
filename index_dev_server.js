@@ -223,7 +223,7 @@ function saveChatMsg(msg, callback) {
 }
 //注销  下线处理
 function statusSetDown(oName,ssocket){    
-  User.update({name:oName},{$set: {status: 'down'}},function(err,doc){ 
+  User.update({username:oName},{$set: {status: 'down'}},function(err,doc){ 
       if(err){ 
           console.log(err);
       }else{ 
@@ -313,19 +313,24 @@ io.on('connection', function(socket){
     socket.to(info.roomId).broadcast.emit('leave-room', leaveInfo)
   })
 
-  socket.on('disconnect',function(e){ 
-    console.log(e,3333)      // Event:  disconnect
-    const Name = "";       
-    for(var n in users){                       
-        if(users[n].Socket === socket){     // get socket match
-            Name = users[n].name;
-        }
-    }
-    statusSetDown(Name,socket);         // status  -->  set down
+  // 下线
+  socket.on('setDown',(name)=>{
+    statusSetDown(name,socket);
+  })
+
+  // socket.on('disconnect',function(e){ 
+  //   console.log(e,3333)      // Event:  disconnect
+  //   const Name = "";       
+  //   for(var n in users){                       
+  //       if(users[n].Socket === socket){     // get socket match
+  //           Name = users[n].name;
+  //       }
+  //   }
+  //   statusSetDown(Name,socket);         // status  -->  set down
     
     // socket.broadcast.emit('userOut',"system@: 【"+client.name+"】 leave ~");
     // console.log(client.name + ':   disconnect');
 
 });
-})
+
 module.exports = http
