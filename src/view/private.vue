@@ -58,7 +58,7 @@ export default {
       MsgList: [],
       socket: null,
       InputMsg: "",
-      roomId: "",
+      privateId: "",
 			msgDOM: {},
     };
   },
@@ -66,7 +66,6 @@ export default {
     this.InitData();
   },
   mounted() {
-    console.log(this.$route.query,111)
     // console.log(aa,333)
     this.msgDOM = document.querySelector(".msg-content");
     this.socket = io("http://localhost:3000");
@@ -81,27 +80,27 @@ export default {
     });
 
     // 进入房间
-    // const infoObj = {
-    //   status: "userstate",
-    //   nickname: this.getUserinfo.nickname,
-    //   roomId: this.roomId
-    // };
-    // this.socket.emit("join-room", infoObj);
-    // this.socket.on("join-room", joinInfo => {
-    //   this.MsgList.push(joinInfo);
-    //   this.$nextTick(() => {
-    //     this.msgDOM.scrollTop = this.msgDOM.scrollHeight;
-    //   });
-    // });
+    const infoObj = {
+      status: "userstate",
+      nickname: this.getUserinfo.nickname,
+      roomId: this.privateId
+    };
+    this.socket.emit("join-room", infoObj);
+    this.socket.on("join-room", joinInfo => {
+      this.MsgList.push(joinInfo);
+      // this.$nextTick(() => {
+      //   this.msgDOM.scrollTop = this.msgDOM.scrollHeight;
+      // });
+    });
 
     // 聊天
-
-    this.socket.on("chat-secret", msg => {
+this.socket.on("chat-msg", msg => {
       this.MsgList.push(msg);
-      this.$nextTick(() => {
-        this.msgDOM.scrollTop = this.msgDOM.scrollHeight;
-      });
+      // this.$nextTick(() => {
+      //   this.msgDOM.scrollTop = this.msgDOM.scrollHeight;
+      // });
     });
+    
     // 离开房间
     this.socket.on("leave-room", leaveInfo => {
       this.MsgList.push(leaveInfo);
@@ -115,16 +114,16 @@ export default {
   },
   methods: {
     async InitData() {
-      this.$store.commit("setUserinfo", getItem("userInfo"));
-      this.roomId = this.$route.query.room;
+      // this.$store.commit("setUserinfo", getItem("userInfo"));
+      this.privateId = this.$route.query.userId;
       // 获取聊天信息
-      const res = await this.$store.dispatch("getHistoryChatMsg", {
-        roomId: this.roomId
-      });
-      this.MsgList = res.data;
-      this.$nextTick(() => {
-        this.msgDOM.scrollTop = this.msgDOM.scrollHeight;
-      });
+      // const res = await this.$store.dispatch("getHistoryChatMsg", {
+      //   roomId: this.privateId
+      // });
+      // this.MsgList = res.data;
+      // this.$nextTick(() => {
+      //   this.msgDOM.scrollTop = this.msgDOM.scrollHeight;
+      // });
     },
     goBack() {
       // 离开房间

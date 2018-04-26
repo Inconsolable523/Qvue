@@ -4,7 +4,8 @@ var io = require('socket.io')(http)
 var multer = require('./util/multer.js')
 var cors = require('cors')
 var request = require('superagent')
-var users={}
+var users = {},
+		usocket = {};
 
 //bodyParse Config
 var bodyParser = require('body-parser')
@@ -62,7 +63,6 @@ app.post('/register', function (req, res) {
 // 登录用户
 app.post('/login', function (req, res) {
   const data = req.body
-  users[data.username] =  data.username
   User.findOne({ username: data.username, password: data.password }, (err, user) => {
     if (err) {
       console.log('login err')
@@ -169,7 +169,7 @@ function getUserUp(ssocket) {
 }
 // 登录上线处理
 function statusSetUp(oName) {
-  User.update({ username: oName }, { $set: { status: 'up' } }, function (err, doc) {
+  User.update({ username: oName }, { $set: { status: 'up' } },function (err, doc) {
     if (err) {
       console.log(err);
     } else {
@@ -223,7 +223,7 @@ function saveChatMsg(msg, callback) {
 }
 //注销  下线处理
 function statusSetDown(oName,ssocket){    
-  User.update({username:oName},{$set: {status: 'down'}},function(err,doc){ 
+  User.update({username:oName},{$set: {status: "down"}},function(err,doc){ 
       if(err){ 
           console.log(err);
       }else{ 
@@ -232,27 +232,32 @@ function statusSetDown(oName,ssocket){
       }
   });
 }
-const clients=[]
+// 私聊处理
+function sendUserMsg(data){
+if(!data.text.indexOf("@")){
+  const start = data.text.indexOf("@")
+  const end = data.text.indexOf(' ')
+  const toMsg=data.text.slice(start+1,end)
+  if(toMsg in usocket){
+    data.text= data.text+"（悄悄话）"
+    usocket[toMsg].emit('chat-msg',data)
+    usocket[data.nickname].emit('chat-msg',data)
+    
+  }else{
+    console.log("用户在线")
+  }
+}
+}
+const arrAllSocket=[]
 io.on('connection', function(socket){
   // 获取在线用户
   getUserUp(socket)
-  // 私聊
-  socket.on("say_private", function (fromuser, touser, content) {    //私聊阶段
-    var toSocket = "";
-    for (var n in clients) {
-      if (clients[ n ].name === touser) {     // get touser -- socket
-        toSocket = clients[ n ].Socket;
-      }
-    }
-    console.log("toSocket:  " + toSocket.id);
-    if (toSocket != "") {
-      socket.emit("say_private_done", touser, content);   //数据返回给fromuser
-      toSocket.emit("sayToYou", fromuser, content);     // 数据返回给 touser
-      console.log(fromuser + " 给 " + touser + "发了份私信： " + content);
-    }
-  });
+  
   // 进入房间
   socket.on('join-room', (info) => {
+    username = info.nickname;
+    users[username] = username;
+    usocket[username] = socket;
     // 添加到房间
     socket.join(info.roomId)
     const joinInfo = {
@@ -262,35 +267,45 @@ io.on('connection', function(socket){
     socket.to(info.roomId).broadcast.emit('join-room', joinInfo)
   })
   // 私聊
-  socket.on('chat-secret', function(data) {
-    for(var i in users){
-        if(users[i].name==data.nickname){
-            // users[i].emit('chat secret',data);
-            socket.to(data.nickname).broadcast.emit('chat-secret', data)
-            console.log(users[i],1111)
-        }
-    }
-});
+  // socket.on('say', (id, msg) => {
+  //   // send a private message to the socket with the given id
+  //   socket.to(id).emit('my message', msg);
+  // });
   // 群聊天
   socket.on('chat-msg', (msg) => {
-    saveChatMsg(msg, () => {
-      io.to(msg.roomId).emit('chat-msg', msg)
-      // 分割聊天消息，判断是否与机器人聊天
-      const msgArr = msg.text.split(' ')
-      const num = msgArr.lastIndexOf('')
-      const robotParam = {
-        userId: msg.userId,
-        roomId: msg.roomId || null,
-        timeStamp: msg.timeStamp + 1 || null,
-        text: msgArr[num+1]
-      }
-      if (msgArr[0] === '@小超') {
-        getRobotMsg(robotParam, (robotmsg) => {
-          saveChatMsg(robotmsg)
-          io.to(msg.roomId).emit('chat-msg', robotmsg)
+    const msgArr = msg.text.split(' ')
+      const num = msgArr.lastIndexOf('') 
+      if(!msgArr[0].indexOf('@') && msgArr[0] !== '@小超'){
+        const privateMsg = {
+          nickname: msg.nickname,
+          userId: msg.userId,
+          roomId: msg.roomId || null,
+          timeStamp: msg.timeStamp + 1 || null,
+          text: msg.text
+        }
+        console.log(privateMsg,'私聊')
+        sendUserMsg(privateMsg)
+      }else{
+        saveChatMsg(msg,()=>{
+          io.to(msg.roomId).emit('chat-msg', msg)
+          // 分割聊天消息，判断是否与机器人聊天  
+          const robotParam = {
+            userId: msg.userId,
+            roomId: msg.roomId || null,
+            timeStamp: msg.timeStamp + 1 || null,
+            text: msgArr[num+1]
+          }
+          if (msgArr[0] === '@小超') {
+            getRobotMsg(robotParam, (robotmsg) => {
+              saveChatMsg(robotmsg)
+              io.to(msg.roomId).emit('chat-msg', robotmsg)
+            })
+          }
         })
+       
       }
-    })
+      
+
   })
   // 机器人聊天
   socket.on('robot-msg', (msg) => {
