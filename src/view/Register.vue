@@ -1,7 +1,7 @@
 <template>
 <div class="content">
   <div class="title">注册</div>
-  <input class="nickname" type="text" v-model="nickname" placeholder="请输入昵称"/>
+  <input class="nickname" type="text" v-model="nickname"   placeholder="请输入昵称"/>
   <input class="username" type="text" v-model="username" placeholder="请输入用户名"/>
   <input class="password" type="password" v-model="password" placeholder="请输入密码"/>
   <div class="sex">
@@ -17,49 +17,54 @@
 </template>
 
 <script>
-import Alert from '@/components/Alert'
-import {setItem} from '@/plugin/sessionStorage-plugin'
+import Alert from "@/components/Alert";
+import { setItem } from "@/plugin/sessionStorage-plugin";
+
 
 export default {
   data() {
     return {
-      nickname: '',
-      username: '',
-      password: '',
-      sex: 'man'
-    }
+      nickname: "",
+      username: "",
+      password: "",
+      sex: "man"
+    };
   },
   methods: {
     goBack() {
-        this.$router.go(-1)
+      this.$router.go(-1);
     },
     async register() {
       if (!this.username || !this.password) {
-        Alert({content: '账号或者密码不能为空！'})
-        return
+        Alert({ content: "账号或者密码不能为空！" });
+        return;
       }
       let data = {
         nickname: this.nickname,
         username: this.username,
         password: this.password,
         sex: this.sex,
-        picUrl: this.sex === 'man' ? '/static/img/default-pic-man.jpg' : '/static/img/default-pic-woman.jpg'
-      }
-      const res = await this.$store.dispatch('register', data)
-      Alert({content: res.data.stateText})
-      if (res.status === 'success') {
-        this.goBack()
+        picUrl:
+          this.sex === "man"
+            ? "/static/img/default-pic-man.jpg"
+            : "/static/img/default-pic-woman.jpg"
+      };
+      const res = await this.$store.dispatch("register", data);
+      Alert({ content: res.data.stateText });
+      if (res.status === "success") {
+        this.goBack();
       }
     }
   }
-}
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
 $style: #000;
 .content {
-  background: url('../assets/img/bg.jpg') no-repeat fixed center center / 100% 100% content-box content-box;
+  background: url("../assets/img/bg.jpg") no-repeat fixed center center / 100%
+    100% content-box content-box;
   background-size: 100% 100%;
   display: -webkit-flex;
   display: flex;
@@ -107,15 +112,18 @@ $style: #000;
     color: $style;
     font-size: 20px;
   }
-  input::-moz-placeholder{   /* Mozilla Firefox 19+ */
+  input::-moz-placeholder {
+    /* Mozilla Firefox 19+ */
     color: $style;
     font-size: 20px;
   }
-  input:-moz-placeholder {    /* Mozilla Firefox 4 to 18 */
+  input:-moz-placeholder {
+    /* Mozilla Firefox 4 to 18 */
     color: $style;
     font-size: 20px;
   }
-  input:-ms-input-placeholder {  /* Internet Explorer 10-11 */
+  input:-ms-input-placeholder {
+    /* Internet Explorer 10-11 */
     color: $style;
     font-size: 20px;
   }
@@ -134,12 +142,12 @@ $style: #000;
       content: "\a0"; /*不换行空格*/
       display: inline-block;
       vertical-align: middle;
-      width: .8rem;
-      height: .8rem;
-      margin-right: .5rem;
+      width: 0.8rem;
+      height: 0.8rem;
+      margin-right: 0.5rem;
       border-radius: 50%;
       border: 2px solid $style;
-      padding: .2rem;
+      padding: 0.2rem;
     }
     input[type="radio"]:checked + label::before {
       background-color: $style;
@@ -157,7 +165,7 @@ $style: #000;
     text-align: center;
     color: $style;
     font-size: 20px;
-    opacity: .85;
+    opacity: 0.85;
     border-radius: 5px;
   }
   .back {

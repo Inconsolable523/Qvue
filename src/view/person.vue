@@ -8,7 +8,7 @@
       <div class="showUp">
         <h3>在线用户：</h3>
         <ul class="showUpDetail">
-          <li v-for="(msg,index) in MsgLists" :key="index"  @click="test(msg)">
+          <li v-for="(msg,index) in MsgLists" :key="index">
             <img :src="msg.picUrl" alt="headpic">
             <span>昵称：{{ msg.nickname }}</span>
           </li>
@@ -54,7 +54,7 @@ export default {
     this.InitInfo();
   },
   mounted() {
-this.msgDOM = document.querySelector('.showUp')
+    this.msgDOM = document.querySelector('.showUp')
     this.socket = io("http://localhost:3000");
     this.socket.on("user_list", msg => {
       msg.forEach((e, index) => {

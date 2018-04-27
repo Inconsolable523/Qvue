@@ -5,7 +5,7 @@ var multer = require('./util/multer.js')
 var cors = require('cors')
 var request = require('superagent')
 var users = {},
-		usocket = {};
+  usocket = {};
 
 //bodyParse Config
 var bodyParser = require('body-parser')
@@ -162,14 +162,14 @@ function getUserUp(ssocket) {
     } else {
       // 因为是回调函数  socket.emit放在这里可以防止  用户更新列表滞后
       ssocket.broadcast.emit('user_list', docs);           //更新用户列表
-      ssocket.emit('user_list',docs);         //更新用户列表
+      ssocket.emit('user_list', docs);         //更新用户列表
 
     }
   });
 }
 // 登录上线处理
 function statusSetUp(oName) {
-  User.update({ username: oName }, { $set: { status: 'up' } },function (err, doc) {
+  User.update({ username: oName }, { $set: { status: 'up' } }, function (err, doc) {
     if (err) {
       console.log(err);
     } else {
@@ -202,7 +202,7 @@ function getRobotMsg(msg, callback) {
         timeStamp: msg.timeStamp || Date.parse(new Date()),
         nickname: '小超',
         headPic: '/static/img/robot-headpic.jpg',
-        text: resText.results[0].values.text
+        text: resText.results[ 0 ].values.text
       }
       callback(msgObj)
     })
@@ -222,42 +222,42 @@ function saveChatMsg(msg, callback) {
   }
 }
 //注销  下线处理
-function statusSetDown(oName,ssocket){    
-  User.update({username:oName},{$set: {status: "down"}},function(err,doc){ 
-      if(err){ 
-          console.log(err);
-      }else{ 
-          console.log(oName+ "  is  down");
-          getUserUp(ssocket);    // 放在内部保证顺序
-      }
+function statusSetDown(oName, ssocket) {
+  User.update({ username: oName }, { $set: { status: "down" } }, function (err, doc) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(oName + "  is  down");
+      getUserUp(ssocket);    // 放在内部保证顺序
+    }
   });
 }
 // 私聊处理
-function sendUserMsg(data){
-if(!data.text.indexOf("@")){
-  const start = data.text.indexOf("@")
-  const end = data.text.indexOf(' ')
-  const toMsg=data.text.slice(start+1,end)
-  if(toMsg in usocket){
-    data.text= data.text+"（悄悄话）"
-    usocket[toMsg].emit('chat-msg',data)
-    usocket[data.nickname].emit('chat-msg',data)
-    
-  }else{
-    console.log("用户在线")
+function sendUserMsg(data) {
+  if (!data.text.indexOf("@")) {
+    const start = data.text.indexOf("@")
+    const end = data.text.indexOf(' ')
+    const toMsg = data.text.slice(start + 1, end)
+    if (toMsg in usocket) {
+      data.text = data.text + "（悄悄话）"
+      usocket[ toMsg ].emit('chat-msg', data)
+      usocket[ data.nickname ].emit('chat-msg', data)
+
+    } else {
+      console.log("用户不在线")
+    }
   }
 }
-}
-const arrAllSocket=[]
-io.on('connection', function(socket){
+
+io.on('connection', function (socket) {
   // 获取在线用户
   getUserUp(socket)
-  
+
   // 进入房间
   socket.on('join-room', (info) => {
     username = info.nickname;
-    users[username] = username;
-    usocket[username] = socket;
+    users[ username ] = username;
+    usocket[ username ] = socket;
     // 添加到房间
     socket.join(info.roomId)
     const joinInfo = {
@@ -266,45 +266,41 @@ io.on('connection', function(socket){
     }
     socket.to(info.roomId).broadcast.emit('join-room', joinInfo)
   })
-  // 私聊
-  // socket.on('say', (id, msg) => {
-  //   // send a private message to the socket with the given id
-  //   socket.to(id).emit('my message', msg);
-  // });
-  // 群聊天
+
+  // 聊天
   socket.on('chat-msg', (msg) => {
+    // 私聊
     const msgArr = msg.text.split(' ')
-      const num = msgArr.lastIndexOf('') 
-      if(!msgArr[0].indexOf('@') && msgArr[0] !== '@小超'){
-        const privateMsg = {
-          nickname: msg.nickname,
+    const num = msgArr.lastIndexOf('')
+    if (!msgArr[ 0 ].indexOf('@') && msgArr[ 0 ] !== '@小超') {
+      const privateMsg = {
+        nickname: msg.nickname,
+        userId: msg.userId,
+        roomId: msg.roomId || null,
+        timeStamp: msg.timeStamp + 1 || null,
+        text: msg.text
+      }
+      sendUserMsg(privateMsg)
+    } else {
+      saveChatMsg(msg, () => {
+        io.to(msg.roomId).emit('chat-msg', msg)
+        // 分割聊天消息，判断是否与机器人聊天  
+        const robotParam = {
           userId: msg.userId,
           roomId: msg.roomId || null,
           timeStamp: msg.timeStamp + 1 || null,
-          text: msg.text
+          text: msgArr[ num + 1 ]
         }
-        console.log(privateMsg,'私聊')
-        sendUserMsg(privateMsg)
-      }else{
-        saveChatMsg(msg,()=>{
-          io.to(msg.roomId).emit('chat-msg', msg)
-          // 分割聊天消息，判断是否与机器人聊天  
-          const robotParam = {
-            userId: msg.userId,
-            roomId: msg.roomId || null,
-            timeStamp: msg.timeStamp + 1 || null,
-            text: msgArr[num+1]
-          }
-          if (msgArr[0] === '@小超') {
-            getRobotMsg(robotParam, (robotmsg) => {
-              saveChatMsg(robotmsg)
-              io.to(msg.roomId).emit('chat-msg', robotmsg)
-            })
-          }
-        })
-       
-      }
-      
+        if (msgArr[ 0 ] === '@小超') {
+          getRobotMsg(robotParam, (robotmsg) => {
+            saveChatMsg(robotmsg)
+            io.to(msg.roomId).emit('chat-msg', robotmsg)
+          })
+        }
+      })
+
+    }
+
 
   })
   // 机器人聊天
@@ -329,8 +325,8 @@ io.on('connection', function(socket){
   })
 
   // 下线
-  socket.on('setDown',(name)=>{
-    statusSetDown(name,socket);
+  socket.on('setDown', (name) => {
+    statusSetDown(name, socket);
   })
 
   // socket.on('disconnect',function(e){ 
@@ -342,9 +338,9 @@ io.on('connection', function(socket){
   //       }
   //   }
   //   statusSetDown(Name,socket);         // status  -->  set down
-    
-    // socket.broadcast.emit('userOut',"system@: 【"+client.name+"】 leave ~");
-    // console.log(client.name + ':   disconnect');
+
+  // socket.broadcast.emit('userOut',"system@: 【"+client.name+"】 leave ~");
+  // console.log(client.name + ':   disconnect');
 
 });
 

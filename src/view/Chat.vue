@@ -150,13 +150,6 @@ export default {
     },
     submit() {
       const $ = window.$;
-      // var str = $("#saytext").val();
-			// $("#show").html(this.replace_em(str));
-			// const inputMsg = this.InputMsg.split(" ")
-			// const num=inputMsg.lastIndexOf('')
-			// if(this.InputMsg.indexOf("@")){
-			// 	this.InputMsg=inputMsg[num+1]
-			// }
       const MsgObj = {
         roomId: this.roomId,
         timeStamp: Date.parse(new Date()),
